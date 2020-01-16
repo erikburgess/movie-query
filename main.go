@@ -21,6 +21,11 @@ func main() {
 
 	flag.Parse()
 
+	if movieName == nil || len(*movieName) <= 0 {
+		fmt.Printf("Must provide -name and a move name\n")
+		os.Exit(1)
+	}
+
 	apiKey, found := os.LookupEnv("OMDB_API_KEY")
 
 	if !found {
@@ -53,8 +58,6 @@ func main() {
 		log.Fatalf("Failed to parse response body %v", err.Error())
 	}
 
-	//log.Printf("Response %v", parsedResponseBody)
-
 	responseResult, err := strconv.ParseBool(parsedResponseBody["Response"].(string))
 
 	if err != nil {
@@ -62,7 +65,7 @@ func main() {
 	}
 
 	if !responseResult {
-		log.Fatalf("%v", parsedResponseBody["Error"])
+		log.Fatalf("OMDB API Error %v", parsedResponseBody["Error"])
 	}
 
 	ratings := parsedResponseBody["Ratings"].([]interface{})
@@ -71,7 +74,7 @@ func main() {
 	for _, rating := range ratings {
 		if rating.(map[string]interface{})["Source"] == "Rotten Tomatoes" {
 			ratingFound = true
-			fmt.Printf("%v", rating.(map[string]interface{})["Value"])
+			fmt.Printf("%v\n", rating.(map[string]interface{})["Value"])
 			break
 		}
 	}
